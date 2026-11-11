@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QA for AI training data: rules, planted defects and an LLM judge | Iyanujesu Taiwo Akinyefa</title>
+<meta name="description" content="Models that call tools learn from conversations: a user asks, the model picks a tool, fills its arguments, reads the output and answers. If that training...">
+<link rel="canonical" href="https://tee-works.github.io/work/tool-use-sft-data-qa.html">
+<meta property="og:title" content="QA for AI training data: rules, planted defects and an LLM judge | Iyanujesu Taiwo Akinyefa">
+<meta property="og:description" content="Models that call tools learn from conversations: a user asks, the model picks a tool, fills its arguments, reads the output and answers. If that training...">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://tee-works.github.io/work/tool-use-sft-data-qa.html">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0a'/%3E%3Ctext x='15' y='23' font-family='Georgia,serif' font-size='19' font-weight='700' fill='%23fafafa' text-anchor='middle'%3EI%3C/text%3E%3Crect x='21' y='20' width='6' height='2.5' fill='%23ff4d5e'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="logo" href="../index.html">Iyanujesu Taiwo Akinyefa</a>
+    <nav class="links" aria-label="Main"><a href="../work/index.html" aria-current="page">Work</a><a href="../writing/index.html">Writing</a><a href="../recognition.html">Recognition</a><a href="../experience.html">Experience</a><a href="../index.html#contact">Contact</a></nav>
+    <div class="tools-r"><button class="theme" id="theme" type="button">Dark</button><a href="../index.html#contact" class="btn small">Let's Talk</a></div>
+  </div>
+</header>
+<main id="main">
+<div class="ph"><div class="wrap">
+  <div class="crumb"><a href="../index.html">Home</a><span>/</span><a href="index.html">Work</a><span>/</span><span>Project</span></div>
+  <h1 style="font-size:clamp(38px,5.6vw,80px);line-height:1;max-width:1050px">QA for AI training data: rules, planted defects and an LLM judge</h1>
+  <p class="lead">Models that call tools learn from conversations: a user asks, the model picks a tool, fills its arguments, reads the output and answers. If that training data is wrong, the model learns to be wrong. I built a reusable QA pipeline that turns “good data” into checks you can measure.</p>
+  <dl class="cs-meta"><div><dt>Type</dt><dd>Independent project</dd></div><div><dt>Data</dt><dd>Public tool-use SFT dataset</dd></div><div><dt>Sample</dt><dd>3,000 conversations</dd></div><div><dt>Focus</dt><dd>AI training data quality</dd></div></dl>
+</div></div>
+<div class="wrap">
+  <div class="story"><h2>01<span>The problem</span></h2><div class="prose"><p>The dataset, glaive-function-calling-v2, has 112,960 conversations under Apache-2.0. Reading them by hand does not scale, and simple rules only see structure. A rule can tell that an argument is missing; it cannot tell that “Paris” was never what the user asked for.</p><p>So the question was not just “what is wrong with this data?” but “how much of what is wrong can each layer of checking actually catch?”</p></div></div>
+  <div class="story"><h2>02<span>What I built</span></h2><div class="prose"><ul><li><b>12 rule checks</b>, cheap enough to run on every row: schema validity, turn order, malformed calls, unknown tools, missing or unknown arguments, types and enums, unterminated turns, numbers not grounded in the tool output, answers that ignore the tool output, refusals when a matching tool exists, and unacknowledged tool errors. Each has a unit test that plants exactly one defect.</li><li><b>A planted-defect benchmark</b>: 150 copies of clean conversations, each with one known defect, to measure what each layer catches.</li><li><b>LLM-as-a-Judge</b> on the Claude API with structured output validated by Pydantic, grading tool selection, argument fidelity, grounding, completeness, and helpfulness and honesty. Each verdict carries a failure-mode label and the evidence span, so it can go straight back to a data vendor.</li><li>What broke along the way: the first grounding rule flagged 59 false positives on paraphrased answers. I redesigned it around word overlap and numeric matching, which left 5.</li></ul></div></div>
+  <div class="story"><h2>03<span>The result</span></h2><div class="prose"><div class="tiles"><div class="tile"><div class="n red">2.4%</div><div class="l">of conversations fail a rule check</div></div><div class="tile"><div class="n red">40%</div><div class="l">open with a prompt already in the sample</div></div><div class="tile"><div class="n">169</div><div class="l">exact duplicate conversations</div></div><div class="tile"><div class="n">23%</div><div class="l">contain a canned refusal</div></div></div><p><b>Rule recall on the planted-defect benchmark:</b></p><table class="recall"><tr><td>Wrong function name</td><td>100%</td></tr><tr><td>Required argument dropped</td><td>100%</td></tr><tr><td>Conversation truncated</td><td>100%</td></tr><tr><td>Number in answer altered</td><td>92%</td></tr><tr><td>Answer swapped from another conversation</td><td>68%</td></tr><tr class="hot"><td>Plausible but wrong argument value</td><td>0%</td></tr></table><p>The bigger risk is low diversity, not broken rows. “Can you order a pizza for me?” appears 99 times, and a model trained on this mix over-learns refusing.</p><p>The benchmark shows exactly where rules stop: 100% recall on structural defects and 0% on plausible but wrong argument values. That gap is the case for a judge, and the judge is scored on the same planted set, like any other check, rather than trusted blindly.</p><p class="note">Stated plainly: the published report’s judge section is a dry run. The 272 judge requests are built and saved in the repository; judge recall and false-positive numbers are filled in by running it with an API key.</p></div></div>
+  <div class="story"><h2>04<span>Stack</span></h2><div class="prose"><div class="chips"><span class="chip">Python</span><span class="chip">Claude API</span><span class="chip">Pydantic</span><span class="chip">pytest</span><span class="chip">Hugging Face datasets</span></div><p style="margin-top:18px;font-size:15px">Focus: AI data · Data quality</p></div></div>
+  <div class="story"><h2>05<span>Links</span></h2><div class="prose"><div class="linkrow"><a class="btn" href="https://github.com/Tee-works/tool-use-sft-data-qa">Code and report <span class="arr">&rarr;</span></a></div></div></div>
+</div>
+<section class="alt" style="padding:80px 0">
+  <div class="wrap">
+    <div class="subhead" style="margin-top:0">Related</div>
+    <div class="work two"><a class="wcard rv" href="../work/trueset.html" data-cats="dq de gov">
+  <div class="art"><svg viewBox="0 0 520 230" aria-hidden="true">
+              <rect x="40" y="30" width="440" height="170" rx="10" fill="var(--console)"/>
+              <g font-family="JetBrains Mono, monospace" font-size="13">
+                <text x="62" y="66" fill="#ffffff">check</text><text x="112" y="66" fill="#e8e8e8">("revenue reconciles")</text>
+                <text x="62" y="92" fill="#8a8a8a">  .on(pandas | duckdb | warehouse)</text>
+                <text x="62" y="118" fill="#8a8a8a">  .owner("finance-data")</text>
+                <text x="62" y="152" fill="#e8e8e8">&#10003; passing rows load</text>
+                <text x="62" y="176" fill="#ff4d5e">&#10007; failing rows quarantined, with reasons</text>
+              </g>
+            </svg></div>
+  <div class="txt"><div class="kind">Open source · Data quality · Data engineering · Governance</div><h3>TrueSet: write a check once, run it anywhere</h3><p class="find">My data quality library: the same check on <b>pandas, DuckDB or a warehouse</b>.</p><div class="tag">Open source · PyPI · Apache-2.0</div><span class="open">Read the case study <span class="arr">&rarr;</span></span></div>
+</a><a class="wcard rv" href="../work/entity-data-quality.html" data-cats="dq gov de">
+  <div class="art"><svg viewBox="0 0 520 230" aria-hidden="true">
+              <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker>
+                <marker id="ahr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--signal)"/></marker></defs>
+              <g stroke="var(--muted)" stroke-width="1.5" fill="none">
+                <path d="M92 168 L168 120" marker-end="url(#ah)"/><path d="M180 178 L182 128" marker-end="url(#ah)"/><path d="M268 170 L200 122" marker-end="url(#ah)"/>
+              </g>
+              <path d="M98 176 C 160 230, 330 220, 400 128" stroke="var(--signal)" stroke-width="2" fill="none" stroke-dasharray="6 6" marker-end="url(#ahr)"/>
+              <path d="M205 100 L392 100" stroke="var(--rule)" stroke-width="2" fill="none" stroke-dasharray="3 6"/>
+              <g class="pulse-node"><circle cx="298" cy="100" r="13" fill="var(--signal-soft)" stroke="var(--signal)" stroke-width="2"/><path d="M292 94 L304 106 M304 94 L292 106" stroke="var(--signal)" stroke-width="2.4"/></g>
+              <circle cx="84" cy="176" r="11" fill="var(--card)" stroke="var(--ink-2)" stroke-width="1.5"/>
+              <circle cx="180" cy="190" r="11" fill="var(--card)" stroke="var(--ink-2)" stroke-width="1.5"/>
+              <circle cx="276" cy="178" r="11" fill="var(--card)" stroke="var(--ink-2)" stroke-width="1.5"/>
+              <circle cx="186" cy="104" r="20" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+              <circle cx="414" cy="108" r="20" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+              <g font-family="JetBrains Mono, monospace" font-size="11.5">
+                <text x="171" y="74" fill="var(--ink)" font-weight="700">RSA</text>
+                <text x="392" y="74" fill="var(--ink)" font-weight="700">Intact</text>
+                <text x="246" y="72" fill="var(--signal)">"no parent"</text>
+                <text x="300" y="214" fill="var(--signal)">"ultimate parent: Intact"</text>
+                <text x="40" y="30" fill="var(--muted)">subsidiaries and their parent disagree</text>
+              </g>
+            </svg></div>
+  <div class="txt"><div class="kind">Project · Data quality · Governance · Data engineering</div><h3>Who owns whom: the global entity register contradicts itself</h3><p class="find"><b>1,477</b> subsidiaries name an ultimate parent their own ownership chain contradicts.</p><div class="tag">SQL · DuckDB · Python · Parquet · GitHub Actions</div><span class="open">Read the case study <span class="arr">&rarr;</span></span></div>
+</a></div>
+    <div class="subhead">More case studies</div>
+    <nav class="pn" aria-label="Previous and next case study">
+      <a href="entity-data-quality.html"><small>&larr; Previous</small><b>Who owns whom: the global entity register contradicts itself</b></a>
+      <a href="health-claims-platform.html"><small>Next &rarr;</small><b>A governed claims platform from messy hospital files</b></a>
+    </nav>
+    <p class="morelink"><a href="index.html">All work &rarr;</a></p>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">&copy; 2026 Iyanujesu Taiwo Akinyefa</div></footer>
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

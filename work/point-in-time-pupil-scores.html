@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What did the teacher actually see? | Iyanujesu Taiwo Akinyefa</title>
+<meta name="description" content="On a learning platform, pupils answer questions all term and teachers see a score for each pupil and topic. Some answers reach the warehouse late, after a...">
+<link rel="canonical" href="https://tee-works.github.io/work/point-in-time-pupil-scores.html">
+<meta property="og:title" content="What did the teacher actually see? | Iyanujesu Taiwo Akinyefa">
+<meta property="og:description" content="On a learning platform, pupils answer questions all term and teachers see a score for each pupil and topic. Some answers reach the warehouse late, after a...">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://tee-works.github.io/work/point-in-time-pupil-scores.html">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0a'/%3E%3Ctext x='15' y='23' font-family='Georgia,serif' font-size='19' font-weight='700' fill='%23fafafa' text-anchor='middle'%3EI%3C/text%3E%3Crect x='21' y='20' width='6' height='2.5' fill='%23ff4d5e'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="logo" href="../index.html">Iyanujesu Taiwo Akinyefa</a>
+    <nav class="links" aria-label="Main"><a href="../work/index.html" aria-current="page">Work</a><a href="../writing/index.html">Writing</a><a href="../recognition.html">Recognition</a><a href="../experience.html">Experience</a><a href="../index.html#contact">Contact</a></nav>
+    <div class="tools-r"><button class="theme" id="theme" type="button">Dark</button><a href="../index.html#contact" class="btn small">Let's Talk</a></div>
+  </div>
+</header>
+<main id="main">
+<div class="ph"><div class="wrap">
+  <div class="crumb"><a href="../index.html">Home</a><span>/</span><a href="index.html">Work</a><span>/</span><span>Project</span></div>
+  <h1 style="font-size:clamp(38px,5.6vw,80px);line-height:1;max-width:1050px">What did the teacher actually see?</h1>
+  <p class="lead">On a learning platform, pupils answer questions all term and teachers see a score for each pupil and topic. Some answers reach the warehouse late, after a dashboard has already shown a score. So “what was this pupil’s score last term?” has two honest answers. This project keeps both, on synthetic data.</p>
+  <dl class="cs-meta"><div><dt>Type</dt><dd>Independent project</dd></div><div><dt>Data</dt><dd>Synthetic, seeded</dd></div><div><dt>Scale</dt><dd>33,284 answers, 300 pupils</dd></div><div><dt>Focus</dt><dd>Point-in-time correctness</dd></div></dl>
+</div></div>
+<div class="wrap">
+  <div class="story"><h2>01<span>The problem</span></h2><div class="prose"><p>The generator creates 33,284 question responses for 300 pupils across 5 topics in one term, with the faults a real feed has: <b>652 responses arrive twice</b> from retried deliveries, about 4% of answers arrive 2 to 12 days late from offline devices (some after term has ended), and 12 answers carry a timestamp in the future.</p><p>The hard parts are the right grain, point-in-time correctness (“reconstruct a pupil’s score as it stood last term”), builds that give the same answer every time, and catching data quality problems before they reach a teacher.</p></div></div>
+  <div class="story"><h2>02<span>What I built</span></h2><div class="prose"><ul><li><b>A staging model with one row per response.</b> Retries collapse to the first load with a deterministic tie-break. Clock-skewed rows are quarantined with a reason, not dropped.</li><li><b>A type-2 score history on two clocks.</b> <code>valid_from</code> and <code>valid_to</code> say when a score was true in the world (answer time); <code>known_from</code> says when the warehouse could first have shown it (load time).</li><li><b>Term-end scores answered two ways</b>: restated, with everything known now, and as reported, what a dashboard could have shown on the last day of term.</li><li>Five checks on every run: one row per response, no overlapping validity windows, exactly one current row per pupil and topic, every score between 0 and 1, and <code>known_from</code> never earlier than <code>valid_from</code>.</li><li>Five tests, including that re-running every model gives a byte-identical result (an order-independent SHA-256 over all outputs) and that the point-in-time lookup matches a direct recomputation from raw answers.</li><li>Written for BigQuery and dbt: the history is built from an incremental model rather than a dbt snapshot, because snapshots capture load time and this needs answer time as well.</li></ul></div></div>
+  <div class="story"><h2>03<span>The result</span></h2><div class="prose"><div class="tiles"><div class="tile"><div class="n red">57 of 1,500</div><div class="l">term-end pupil-topic scores restated after term</div></div><div class="tile"><div class="n">3.8%</div><div class="l">of term-end scores, across 53 pupils</div></div><div class="tile"><div class="n red">0.107</div><div class="l">largest move, about 11 percentage points</div></div><div class="tile"><div class="n">12</div><div class="l">clock-skewed answers quarantined, not dropped</div></div></div><p>The late answers are planted, so the point is not that they exist. The point is that the model keeps the restated scores apart from what teachers originally saw.</p><p>A report of what teachers were told needs the as-reported view. A model trained on true ability needs the restated one. One table that silently mixes them is how a predicted grade drifts from what a teacher remembers seeing.</p><p class="note">Independent project on synthetic data only, with no real pupils. Not production work.</p></div></div>
+  <div class="story"><h2>04<span>Stack</span></h2><div class="prose"><div class="chips"><span class="chip">SQL</span><span class="chip">DuckDB</span><span class="chip">Python</span><span class="chip">pytest</span><span class="chip">BigQuery-style SQL (QUALIFY)</span><span class="chip">dbt design</span></div><p style="margin-top:18px;font-size:15px">Focus: Data engineering · Data quality · Analytics</p></div></div>
+  <div class="story"><h2>05<span>Links</span></h2><div class="prose"><div class="linkrow"><a class="btn" href="https://github.com/Tee-works/point-in-time-pupil-scores">Code <span class="arr">&rarr;</span></a></div></div></div>
+</div>
+<section class="alt" style="padding:80px 0">
+  <div class="wrap">
+    <div class="subhead" style="margin-top:0">Related</div>
+    <div class="work two"><a class="wcard rv" href="../work/snowflake-cost-attribution.html" data-cats="de an gov">
+  <div class="art"><div class="art num"><b>80%</b><span>of Snowflake credits were idle warehouse time</span></div></div>
+  <div class="txt"><div class="kind">Project · Data engineering · Analytics · Governance</div><h3>Who’s burning the Snowflake bill?</h3><p class="find"><b>80% of credits</b> (3,285 of 4,103) were idle warehouse time. Query-level costs reconcile to the bill to 1e-6.</p><div class="tag">SQL · DuckDB · Python · Snowflake schema · synthetic data</div><span class="open">Read the case study <span class="arr">&rarr;</span></span></div>
+</a><a class="wcard rv" href="../work/holdings-data-quality.html" data-cats="dq gov">
+  <div class="art"><svg viewBox="0 0 520 230" aria-hidden="true">
+              <line x1="40" y1="190" x2="490" y2="190" stroke="var(--rule)" stroke-width="1.5"/>
+              <g>
+                <rect class="grow" x="70"  y="70" width="56" height="120" rx="4" fill="var(--ink-2)"/>
+                <rect class="grow" x="70"  y="40" width="56" height="30" rx="4" fill="var(--signal)" style="animation-delay:.2s"/>
+                <rect class="grow" x="170" y="66" width="56" height="124" rx="4" fill="var(--ink-2)" style="animation-delay:.1s"/>
+                <rect class="grow" x="170" y="34" width="56" height="32" rx="4" fill="var(--signal)" style="animation-delay:.3s"/>
+                <rect class="grow" x="270" y="60" width="56" height="130" rx="4" fill="var(--ink-2)" style="animation-delay:.2s"/>
+                <rect class="grow" x="270" y="26" width="56" height="34" rx="4" fill="var(--signal)" style="animation-delay:.4s"/>
+                <rect class="grow" x="370" y="56" width="56" height="134" rx="4" fill="var(--ink-2)" style="animation-delay:.3s"/>
+                <rect class="grow" x="370" y="20" width="56" height="36" rx="4" fill="var(--signal)" style="animation-delay:.5s"/>
+              </g>
+              <g font-family="JetBrains Mono, monospace" font-size="11" fill="var(--muted)">
+                <text x="76" y="210">Q4</text><text x="176" y="210">Q1</text><text x="276" y="210">Q2</text><text x="376" y="210">Q3</text>
+                <text x="440" y="34" fill="var(--signal)">counted</text><text x="440" y="48" fill="var(--signal)">twice</text>
+              </g>
+            </svg></div>
+  <div class="txt"><div class="kind">Project · Data quality · Governance</div><h3>A subsidiary counted twice, four quarters running</h3><p class="find">Up to <b>$99.6bn</b> in one report, invisible to a quarter-on-quarter check.</p><div class="tag">SQL · DuckDB · Python · TrueSet · Power BI</div><span class="open">Read the case study <span class="arr">&rarr;</span></span></div>
+</a></div>
+    <div class="subhead">More case studies</div>
+    <nav class="pn" aria-label="Previous and next case study">
+      <a href="snowflake-cost-attribution.html"><small>&larr; Previous</small><b>Who’s burning the Snowflake bill?</b></a>
+      <a href="entity-data-quality.html"><small>Next &rarr;</small><b>Who owns whom: the global entity register contradicts itself</b></a>
+    </nav>
+    <p class="morelink"><a href="index.html">All work &rarr;</a></p>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">&copy; 2026 Iyanujesu Taiwo Akinyefa</div></footer>
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

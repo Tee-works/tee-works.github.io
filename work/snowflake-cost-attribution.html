@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Who’s burning the Snowflake bill? | Iyanujesu Taiwo Akinyefa</title>
+<meta name="description" content="When analytics is decentralised, dozens of people and service users run queries on shared Snowflake warehouses. The bill arrives per warehouse, not per...">
+<link rel="canonical" href="https://tee-works.github.io/work/snowflake-cost-attribution.html">
+<meta property="og:title" content="Who’s burning the Snowflake bill? | Iyanujesu Taiwo Akinyefa">
+<meta property="og:description" content="When analytics is decentralised, dozens of people and service users run queries on shared Snowflake warehouses. The bill arrives per warehouse, not per...">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://tee-works.github.io/work/snowflake-cost-attribution.html">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0a'/%3E%3Ctext x='15' y='23' font-family='Georgia,serif' font-size='19' font-weight='700' fill='%23fafafa' text-anchor='middle'%3EI%3C/text%3E%3Crect x='21' y='20' width='6' height='2.5' fill='%23ff4d5e'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="logo" href="../index.html">Iyanujesu Taiwo Akinyefa</a>
+    <nav class="links" aria-label="Main"><a href="../work/index.html" aria-current="page">Work</a><a href="../writing/index.html">Writing</a><a href="../recognition.html">Recognition</a><a href="../experience.html">Experience</a><a href="../index.html#contact">Contact</a></nav>
+    <div class="tools-r"><button class="theme" id="theme" type="button">Dark</button><a href="../index.html#contact" class="btn small">Let's Talk</a></div>
+  </div>
+</header>
+<main id="main">
+<div class="ph"><div class="wrap">
+  <div class="crumb"><a href="../index.html">Home</a><span>/</span><a href="index.html">Work</a><span>/</span><span>Project</span></div>
+  <h1 style="font-size:clamp(38px,5.6vw,80px);line-height:1;max-width:1050px">Who’s burning the Snowflake bill?</h1>
+  <p class="lead">When analytics is decentralised, dozens of people and service users run queries on shared Snowflake warehouses. The bill arrives per warehouse, not per person, so when it jumps nobody knows who to talk to. This project builds query-level cost attribution and team showback, on synthetic data.</p>
+  <dl class="cs-meta"><div><dt>Type</dt><dd>Independent project</dd></div><div><dt>Data</dt><dd>Synthetic, seeded</dd></div><div><dt>Scale</dt><dd>9,451 queries, 4 warehouses</dd></div><div><dt>Focus</dt><dd>Cost attribution, showback</dd></div></dl>
+</div></div>
+<div class="wrap">
+  <div class="story"><h2>01<span>The problem</span></h2><div class="prose"><p>Snowflake bills for the time a warehouse is running, including the idle tail before it auto-suspends. Snowflake’s own <code>QUERY_ATTRIBUTION_HISTORY</code> leaves idle time out, so attributing cost per user alone can hide most of the bill.</p><p>And showback that people cannot reconcile to the bill gets argued with, not acted on. Every credit has to land somewhere, and the total has to match the invoice.</p><p>The generator simulates four weeks of <code>ACCOUNT_USAGE</code>: 9,451 queries from 30 data champions plus Airflow, Airbyte and Looker service users, across four warehouses, with the hourly metering those queries would bill. It plants four cost problems: a dashboard refreshing every 15 minutes all night on a LARGE warehouse, one person re-running an unfiltered scan every working hour, an ad-hoc warehouse with a one-hour auto-suspend, and a 20x week-over-week spike for one team.</p></div></div>
+  <div class="story"><h2>02<span>What I built</span></h2><div class="prose"><ul><li><b>Query x hour slices</b>, so a long query is split across the clock hours it ran in.</li><li><b>Warehouse busy time as the union of query time</b>, so concurrent queries are not double counted. Idle time is billed running time minus busy time.</li><li><b>Query cost</b>: each hour’s active credits are shared by its queries in proportion to execution seconds, and idle credits stay with the warehouse instead of being smeared across users.</li><li><b>Showback</b> by user, team and workload, in credits and USD, with alerts for a team week-over-week spike, a warehouse idle share over 25%, and any workload over 10% of spend.</li><li>Five checks run on every build: the reconciliation to the bill, one row per query, every query costed, no negative or null costs, and busy time never more than running time. Four tests check the checks, including that the planted problems are flagged and that a rebuild gives the same numbers.</li><li>The column names match Snowflake’s, so the SQL runs there with only the source names changed. An Airflow DAG sketches the daily job; it is illustrative and not run in the tests.</li></ul></div></div>
+  <div class="story"><h2>03<span>The result</span></h2><div class="prose"><div class="tiles"><div class="tile"><div class="n red">80%</div><div class="l">of metered credits were idle warehouse time (3,285 of 4,103)</div></div><div class="tile"><div class="n">1e-6</div><div class="l">attributed plus idle credits equal the bill, to this tolerance</div></div><div class="tile"><div class="n red">86%</div><div class="l">of the BI warehouse’s credits were idle, kept awake by an overnight refresh</div></div><div class="tile"><div class="n">26%</div><div class="l">of query spend came from one dashboard</div></div></div><p>The biggest cost was not anyone’s SQL. The overnight dashboard refresh kept the BI warehouse awake (86% idle), and the ad-hoc warehouse’s one-hour auto-suspend did the same (79% idle). The fixes are a shorter auto-suspend and a less frequent refresh, not asking 30 people to write cheaper queries.</p><p>All three planted user-level problems were caught: the dashboard, the hourly unfiltered scan and the team spike.</p><p class="note">Independent project on synthetic data generated from a seed. Not production work; the numbers come from the simulated account.</p></div></div>
+  <div class="story"><h2>04<span>Stack</span></h2><div class="prose"><div class="chips"><span class="chip">SQL</span><span class="chip">DuckDB</span><span class="chip">Python</span><span class="chip">pandas</span><span class="chip">pytest</span><span class="chip">Snowflake ACCOUNT_USAGE schema</span><span class="chip">Airflow (sketch)</span></div><p style="margin-top:18px;font-size:15px">Focus: Data engineering · Analytics · Governance</p></div></div>
+  <div class="story"><h2>05<span>Links</span></h2><div class="prose"><div class="linkrow"><a class="btn" href="https://github.com/Tee-works/snowflake-cost-attribution">Code <span class="arr">&rarr;</span></a></div></div></div>
+</div>
+<section class="alt" style="padding:80px 0">
+  <div class="wrap">
+    <div class="subhead" style="margin-top:0">Related</div>
+    <div class="work two"><a class="wcard rv" href="../work/revenue-reconciliation.html" data-cats="dq an gov">
+  <div class="art"><div class="art num"><b>$2.97M</b><span>misattributed revenue, traced and fixed</span></div></div>
+  <div class="txt"><div class="kind client">Client work · Data quality · Analytics · Governance</div><h3>$2.97M of revenue credited to the wrong place</h3><p class="find">Traced through four pipeline layers to <b>one silent join fallback</b>. Unattributed revenue fell from 24% to 2.8%.</p><div class="tag">SQL · Redshift · Snowflake · Power BI · Zenoti POS</div><span class="open">Read the case study <span class="arr">&rarr;</span></span></div>
+</a><a class="wcard rv" href="../work/point-in-time-pupil-scores.html" data-cats="de dq an">
+  <div class="art"><div class="art num"><b>57</b><span>of 1,500 term-end scores restated after teachers saw them</span></div></div>
+  <div class="txt"><div class="kind">Project · Data engineering · Data quality · Analytics</div><h3>What did the teacher actually see?</h3><p class="find">The model keeps the <b>57 of 1,500</b> restated term-end scores apart from what teachers saw at the time.</p><div class="tag">SQL · DuckDB · Python · type-2 history · synthetic data</div><span class="open">Read the case study <span class="arr">&rarr;</span></span></div>
+</a></div>
+    <div class="subhead">More case studies</div>
+    <nav class="pn" aria-label="Previous and next case study">
+      <a href="holdings-data-quality.html"><small>&larr; Previous</small><b>A subsidiary counted twice, four quarters running</b></a>
+      <a href="point-in-time-pupil-scores.html"><small>Next &rarr;</small><b>What did the teacher actually see?</b></a>
+    </nav>
+    <p class="morelink"><a href="index.html">All work &rarr;</a></p>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">&copy; 2026 Iyanujesu Taiwo Akinyefa</div></footer>
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

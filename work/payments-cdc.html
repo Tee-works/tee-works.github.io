@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payments change data capture that keeps every state | Iyanujesu Taiwo Akinyefa</title>
+<meta name="description" content="Batch extracts that ask for rows updated since the last run see each payment once. A payment that goes pending, failed, then successful between runs looks...">
+<link rel="canonical" href="https://tee-works.github.io/work/payments-cdc.html">
+<meta property="og:title" content="Payments change data capture that keeps every state | Iyanujesu Taiwo Akinyefa">
+<meta property="og:description" content="Batch extracts that ask for rows updated since the last run see each payment once. A payment that goes pending, failed, then successful between runs looks...">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://tee-works.github.io/work/payments-cdc.html">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0a'/%3E%3Ctext x='15' y='23' font-family='Georgia,serif' font-size='19' font-weight='700' fill='%23fafafa' text-anchor='middle'%3EI%3C/text%3E%3Crect x='21' y='20' width='6' height='2.5' fill='%23ff4d5e'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="logo" href="../index.html">Iyanujesu Taiwo Akinyefa</a>
+    <nav class="links" aria-label="Main"><a href="../work/index.html" aria-current="page">Work</a><a href="../writing/index.html">Writing</a><a href="../recognition.html">Recognition</a><a href="../experience.html">Experience</a><a href="../index.html#contact">Contact</a></nav>
+    <div class="tools-r"><button class="theme" id="theme" type="button">Dark</button><a href="../index.html#contact" class="btn small">Let's Talk</a></div>
+  </div>
+</header>
+<main id="main">
+<div class="ph"><div class="wrap">
+  <div class="crumb"><a href="../index.html">Home</a><span>/</span><a href="index.html">Work</a><span>/</span><span>Project</span></div>
+  <h1 style="font-size:clamp(38px,5.6vw,80px);line-height:1;max-width:1050px">Payments change data capture that keeps every state</h1>
+  <p class="lead">Batch extracts that ask for rows updated since the last run see each payment once. A payment that goes pending, failed, then successful between runs looks successful, and hard deletes vanish. For a payments ledger that is not good enough.</p>
+  <dl class="cs-meta"><div><dt>Type</dt><dd>Independent project</dd></div><div><dt>Pattern</dt><dd>Change data capture</dd></div><div><dt>Runs on</dt><dd>Docker or Kubernetes</dd></div><div><dt>Focus</dt><dd>Streaming, reconciliation</dd></div></dl>
+</div></div>
+<div class="wrap">
+  <div class="story"><h2>01<span>The problem</span></h2><div class="prose"><p>A payments team needs every state a payment passed through, a warehouse that matches the source on money (not just on row counts), and a pipeline that can crash and replay without counting anything twice.</p></div></div>
+  <div class="story"><h2>02<span>What I built</span></h2><div class="prose"><ul><li>Debezium reads every insert, status change and delete from the MySQL binlog into Kafka; a JDBC sink upserts the current state into a Postgres warehouse and follows schema changes.</li><li>A Python consumer reads the same stream into an append-only status history. Writes are idempotent: each row is keyed by its binlog position, and Kafka offsets are committed only after the database transaction, so a crash and replay inserts nothing twice.</li><li>Lifecycle rules flag changes that should never happen, such as failed to success or an amount edited after settlement. They are recorded, not dropped; only unparseable messages go to a dead-letter topic with the reason.</li><li>A daily Airflow job reconciles source and warehouse by count and by amount for each day and status, because matching row counts can hide a truncated amount.</li><li>Runs locally in Docker or on Kubernetes with Strimzi, a Helm chart and Terraform. CI runs lint, unit tests, helm lint, terraform validate, a DAG import check and a full end-to-end test on every push.</li></ul></div></div>
+  <div class="story"><h2>03<span>The result</span></h2><div class="prose"><div class="tiles"><div class="tile"><div class="n">500</div><div class="l">payments moved through their lifecycle in the demo</div></div><div class="tile"><div class="n red">5 of 5</div><div class="l">deliberately illegal changes flagged</div></div><div class="tile"><div class="n">0</div><div class="l">duplicates after a crash and replay</div></div><div class="tile"><div class="n">Daily</div><div class="l">reconciliation by count and by amount</div></div></div><p>In the demo, 500 payments move through their lifecycle with 5 deliberately illegal changes. All 5 are flagged, and the warehouse reconciles to the source by count and amount.</p></div></div>
+  <div class="story"><h2>04<span>Stack</span></h2><div class="prose"><div class="chips"><span class="chip">MySQL</span><span class="chip">Debezium</span><span class="chip">Kafka (KRaft)</span><span class="chip">Kafka Connect</span><span class="chip">Postgres</span><span class="chip">Python</span><span class="chip">Airflow</span><span class="chip">Kubernetes</span><span class="chip">Strimzi</span><span class="chip">Helm</span><span class="chip">Terraform</span><span class="chip">GitHub Actions</span></div><p style="margin-top:18px;font-size:15px">Focus: Data engineering</p></div></div>
+  <div class="story"><h2>05<span>Links</span></h2><div class="prose"><div class="linkrow"><a class="btn" href="https://github.com/Tee-works/payments-cdc-pipeline">Code and design notes <span class="arr">&rarr;</span></a></div></div></div>
+</div>
+<section class="alt" style="padding:80px 0">
+  <div class="wrap">
+    <div class="subhead" style="margin-top:0">Related</div>
+    <div class="work two"><a class="wcard rv" href="../work/health-claims-platform.html" data-cats="de gov an">
+  <div class="art"><svg viewBox="0 0 520 230" aria-hidden="true">
+              <defs><marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
+              <g font-family="JetBrains Mono, monospace" font-size="11">
+                <rect x="24" y="30" width="138" height="34" rx="6" fill="var(--card)" stroke="var(--rule)"/><text x="36" y="52" fill="var(--ink-2)">2026-03-14</text>
+                <rect x="24" y="78" width="138" height="34" rx="6" fill="var(--card)" stroke="var(--rule)"/><text x="36" y="100" fill="var(--ink-2)">14/03/2026</text>
+                <rect x="24" y="126" width="138" height="34" rx="6" fill="var(--card)" stroke="var(--rule)"/><text x="36" y="148" fill="var(--ink-2)">20260314</text>
+                <rect x="290" y="62" width="200" height="66" rx="10" fill="var(--ink)"/><text x="306" y="90" fill="var(--paper)">fct_claims</text><text x="306" y="112" fill="var(--console-dim)" font-size="10">tested &middot; pseudonymised</text>
+                <rect x="290" y="156" width="200" height="40" rx="8" fill="var(--signal-soft)" stroke="var(--signal)"/><text x="304" y="181" fill="var(--signal)">quarantine + reasons</text>
+                <text x="24" y="200" fill="var(--muted)">299 files &middot; 3 formats &middot; 15 hospitals</text>
+              </g>
+              <g stroke="var(--muted)" stroke-width="1.5" fill="none">
+                <path d="M166 47 L284 88" marker-end="url(#ah3)"/><path d="M166 95 L284 95" marker-end="url(#ah3)"/><path d="M166 143 L284 104" marker-end="url(#ah3)"/>
+                <path d="M200 120 L284 170" marker-end="url(#ah3)" stroke="var(--signal)" stroke-dasharray="4 4"/>
+              </g>
+            </svg></div>
+  <div class="txt"><div class="kind">Project · Data engineering · Governance · Analytics</div><h3>A governed claims platform from messy hospital files</h3><p class="find"><b>18 dbt models, 49 data tests</b>, pseudonymised marts and governance rules checked on every build.</p><div class="tag">Python · dbt · DuckDB · OPA · Terraform (AWS)</div><span class="open">Read the case study <span class="arr">&rarr;</span></span></div>
+</a><a class="wcard rv" href="../work/revenue-reconciliation.html" data-cats="dq an gov">
+  <div class="art"><div class="art num"><b>$2.97M</b><span>misattributed revenue, traced and fixed</span></div></div>
+  <div class="txt"><div class="kind client">Client work · Data quality · Analytics · Governance</div><h3>$2.97M of revenue credited to the wrong place</h3><p class="find">Traced through four pipeline layers to <b>one silent join fallback</b>. Unattributed revenue fell from 24% to 2.8%.</p><div class="tag">SQL · Redshift · Snowflake · Power BI · Zenoti POS</div><span class="open">Read the case study <span class="arr">&rarr;</span></span></div>
+</a></div>
+    <div class="subhead">More case studies</div>
+    <nav class="pn" aria-label="Previous and next case study">
+      <a href="health-claims-platform.html"><small>&larr; Previous</small><b>A governed claims platform from messy hospital files</b></a>
+      <a href="trueset.html"><small>Next &rarr;</small><b>TrueSet: write a check once, run it anywhere</b></a>
+    </nav>
+    <p class="morelink"><a href="index.html">All work &rarr;</a></p>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">&copy; 2026 Iyanujesu Taiwo Akinyefa</div></footer>
+<script src="../assets/site.js" defer></script>
+</body>
+</html>
