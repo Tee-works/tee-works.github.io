@@ -395,3 +395,13 @@ dialog.arch-dlg::backdrop { background: rgba(0,0,0,.7); }
 .arch-dlg .bar button { border: 1px solid var(--rule); background: none; color: var(--ink); padding: 6px 12px; cursor: pointer; font: inherit; }
 .arch-dlg .body { overflow: auto; padding: 16px; }
 .arch-dlg .body svg { display: block; min-width: 900px; width: 100%; height: auto; }
+
+/* code blocks and product band (TrueSet) */
+.prose pre.code { margin: 14px 0 22px; padding: 16px 18px; background: var(--bg-2); border: 1px solid var(--rule); border-radius: 4px; overflow-x: auto; }
+.prose pre.code code { background: none; padding: 0; font: 13.5px/1.55 var(--mono); color: var(--ink); }
+.cs-meta code { font: 0.92em var(--mono); }
+.band { border: 1px solid var(--rule); background: var(--card); padding: 28px 30px; display: grid; grid-template-columns: 1fr auto; gap: 18px 32px; align-items: center; }
+.band .k { font: 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--red); margin-bottom: 8px; }
+.band h3 { font-family: var(--serif); font-size: clamp(24px, 2.6vw, 34px); line-height: 1.15; margin: 0 0 8px; }
+.band p { margin: 0; color: var(--ink-2); font-size: 15.5px; max-width: 720px; }
+@media (max-width: 760px) { .band { grid-template-columns: 1fr; padding: 22px 18px; } }

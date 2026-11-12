@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TrueSet: open-source data quality and reconciliation | Iyanujesu Taiwo Akinyefa</title>
-<meta name="description" content="Teams rewrite the same data checks for every engine they use: once in pandas for a notebook, again in SQL for the warehouse, again for the next tool....">
+<title>TrueSet | Iyanujesu Taiwo Akinyefa</title>
+<meta name="description" content="TrueSet, the open-source data quality and reconciliation library I founded and maintain: catch the problems single-table checks miss, write a check once and run it on any engine.">
 <link rel="canonical" href="https://tee-works.github.io/work/trueset.html">
-<meta property="og:title" content="TrueSet: open-source data quality and reconciliation | Iyanujesu Taiwo Akinyefa">
-<meta property="og:description" content="Teams rewrite the same data checks for every engine they use: once in pandas for a notebook, again in SQL for the warehouse, again for the next tool....">
+<meta property="og:title" content="TrueSet | Iyanujesu Taiwo Akinyefa">
+<meta property="og:description" content="TrueSet, the open-source data quality and reconciliation library I founded and maintain: catch the problems single-table checks miss, write a check once and run it on any engine.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://tee-works.github.io/work/trueset.html">
 <meta name="theme-color" content="#0a0a0a">
@@ -23,23 +23,99 @@
 <header class="nav" id="nav">
   <div class="wrap">
     <a class="logo" href="../index.html">Iyanujesu Taiwo Akinyefa</a>
-    <nav class="links" aria-label="Main"><a href="../work/index.html" aria-current="page">Work</a><a href="../writing/index.html">Writing</a><a href="../recognition.html">Recognition</a><a href="../experience.html">Experience</a><a href="../index.html#contact">Contact</a></nav>
+    <nav class="links" aria-label="Main"><a href="../work/index.html">Work</a><a href="../work/trueset.html" aria-current="page">TrueSet</a><a href="../writing/index.html">Writing</a><a href="../recognition.html">Recognition</a><a href="../experience.html">Experience</a><a href="../index.html#contact">Contact</a></nav>
     <div class="tools-r"><button class="theme" id="theme" type="button">Dark</button><a href="../index.html#contact" class="btn small">Let's Talk</a></div>
   </div>
 </header>
 <main id="main">
 <div class="ph"><div class="wrap">
-  <div class="crumb"><a href="../index.html">Home</a><span>/</span><a href="index.html">Work</a><span>/</span><span>Open source</span></div>
-  <h1 style="font-size:clamp(38px,5.6vw,80px);line-height:1;max-width:1050px">TrueSet: open-source data quality and reconciliation</h1>
-  <p class="lead">Teams rewrite the same data checks for every engine they use: once in pandas for a notebook, again in SQL for the warehouse, again for the next tool. TrueSet lets you write a check once and run it unchanged where the data lives.</p>
-  <dl class="cs-meta"><div><dt>Type</dt><dd>Open-source library</dd></div><div><dt>Licence</dt><dd>Apache-2.0</dd></div><div><dt>Install</dt><dd>pip install trueset</dd></div><div><dt>Focus</dt><dd>Checks, reconciliation</dd></div></dl>
+  <div class="crumb"><a href="../index.html">Home</a><span>/</span><span>TrueSet</span></div>
+  <h1 style="font-size:clamp(38px,5.6vw,80px);line-height:1;max-width:1050px">TrueSet: catch the data problems single-table checks miss</h1>
+  <p class="lead">dbt tests, Great Expectations and Soda validate one table at a time. They cannot see a value that silently changed between two systems, or tell a real spike from a $2.9M error. TrueSet is the open-source library I founded to do exactly that, with every check written once and run on any engine.</p>
+  <dl class="cs-meta"><div><dt>My role</dt><dd>Founder and maintainer</dd></div><div><dt>Status</dt><dd>v0.2.0 on PyPI, pre-launch</dd></div><div><dt>Licence</dt><dd>Apache-2.0, open source</dd></div><div><dt>Install</dt><dd><code>pip install trueset</code></dd></div></dl>
+  <div class="linkrow" style="margin-top:28px"><a class="btn" href="https://trueset-dev.github.io/trueset/">Website <span class="arr">&rarr;</span></a><a class="btn ghost" href="https://trueset-dev.github.io/trueset/docs/">Docs <span class="arr">&rarr;</span></a><a class="btn ghost" href="https://github.com/trueset-dev/trueset">GitHub <span class="arr">&rarr;</span></a><a class="btn ghost" href="https://pypi.org/project/trueset/">PyPI <span class="arr">&rarr;</span></a></div>
 </div></div>
 <div class="wrap">
-  <div class="story"><h2>01<span>The problem</span></h2><div class="prose"><p>When the same rule exists in three places, the three copies drift apart, and nobody can say which one is the real definition. Failing rows also tend to be counted rather than kept, so nobody can fix them.</p></div></div>
-  <div class="story"><h2>02<span>What I built</span></h2><div class="prose"><ul><li>Checks run on pandas, DuckDB or a warehouse as pushed-down SQL.</li><li>Cross-system reconciliation, so a load can be proven against its source.</li><li>Failing rows are quarantined with their reasons, not just counted.</li><li>Owner and sensitivity metadata on every check, so governance travels with the rule. Published on PyPI under Apache-2.0.</li></ul></div></div>
-  <div class="story"><h2>03<span>The result</span></h2><div class="prose"><div class="tiles"><div class="tile"><div class="n">3</div><div class="l">engines, one check: pandas, DuckDB, warehouse SQL</div></div><div class="tile"><div class="n">1</div><div class="l">definition per rule, with owner and sensitivity</div></div></div><p>TrueSet does the load reconciliation in the holdings project, proving what was loaded against what the SEC published, and the data contracts in the claims platform, where exactly the 40 broken rows are quarantined.</p></div></div>
-  <div class="story"><h2>04<span>Stack</span></h2><div class="prose"><div class="chips"><span class="chip">Python</span><span class="chip">pandas</span><span class="chip">DuckDB</span><span class="chip">SQLAlchemy</span><span class="chip">GitHub Actions</span><span class="chip">PyPI</span></div><p style="margin-top:18px;font-size:15px">Focus: Data quality · Data engineering · Governance</p></div></div>
-  <div class="story"><h2>05<span>Links</span></h2><div class="prose"><div class="linkrow"><a class="btn" href="https://github.com/trueset-dev/trueset">Code <span class="arr">&rarr;</span></a><a class="btn ghost" href="https://pypi.org/project/trueset/">PyPI <span class="arr">&rarr;</span></a></div></div></div>
+  <figure class="arch" id="architecture">
+    <button class="arch-open" type="button" aria-haspopup="dialog" aria-label="Open the TrueSet diagram full size"><svg viewBox="0 0 1000 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ts-t ts-d">
+<title id="ts-t">How TrueSet works</title>
+<desc id="ts-d">A check is written once in checks.yml. The TrueSet engine runs it through one Backend protocol on pandas, DuckDB or a warehouse as pushed-down SQL, and can compare two systems. It returns deterministic pass or fail results as JSON and an exit code, quarantines failing rows with reasons, and saves history for monitoring. AI can draft and explain checks but never decides pass or fail.</desc>
+<defs><marker id="tah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<rect class="bx" x="20" y="40" width="200" height="150"/>
+<text class="ft" x="36" y="66">Write once</text>
+<text class="m" x="36" y="96">checks.yml</text>
+<text class="s" x="36" y="118">not_null, unique, in_range</text>
+<text class="s" x="36" y="136">value_parity, corroboration</text>
+<text class="s" x="36" y="154">owner, sensitivity, regulation</text>
+<text class="s" x="36" y="172">or: import-dbt, suggest</text>
+<rect class="bx" x="20" y="230" width="200" height="90"/>
+<text class="ft" x="36" y="256">AI copilot</text>
+<text class="s" x="36" y="280">drafts and explains checks</text>
+<text class="s" x="36" y="298">never decides pass or fail</text>
+<path class="ln" d="M220 115 H279" marker-end="url(#tah)"/>
+<path class="ln" style="stroke-dasharray:4 4" d="M120 230 V191" marker-end="url(#tah)"/>
+<rect class="bx hl" x="280" y="40" width="260" height="280"/>
+<text class="ft" x="296" y="66">TrueSet engine</text>
+<text class="t" x="296" y="96">One Backend protocol</text>
+<text class="s" x="296" y="118">the same verdict on every engine,</text>
+<text class="s" x="296" y="136">proven identical in tests</text>
+<text class="t" x="296" y="176">Reconcile two systems</text>
+<text class="s" x="296" y="198">row counts, keys, values</text>
+<text class="s" x="296" y="216">even across different engines</text>
+<text class="t" x="296" y="256">Corroborate extremes</text>
+<text class="s" x="296" y="278">a spike is trusted only if</text>
+<text class="s" x="296" y="296">volume or a second feed agrees</text>
+<rect class="bx" x="600" y="40" width="380" height="120"/>
+<text class="ft" x="616" y="66">Runs where the data lives</text>
+<text class="t" x="616" y="96">pandas  ·  DuckDB</text>
+<text class="t" x="616" y="122">Warehouse as pushed-down SQL</text>
+<text class="s" x="616" y="144">Snowflake, BigQuery, Databricks, Postgres, Redshift</text>
+<rect class="bx" x="600" y="190" width="380" height="130"/>
+<text class="ft" x="616" y="216">What you get back</text>
+<text class="s" x="616" y="240">pass or fail as JSON, non-zero exit code on error</text>
+<text class="s" x="616" y="260">failing rows quarantined with their reasons</text>
+<text class="s" x="616" y="280">history, freshness and anomaly monitoring</text>
+<text class="s" x="616" y="300">report by owner, sensitivity or regulation</text>
+<path class="ln" d="M540 100 H599" marker-end="url(#tah)"/>
+<path class="ln" d="M540 255 H599" marker-end="url(#tah)"/>
+<rect class="bx" x="20" y="360" width="960" height="80"/>
+<text class="t" x="36" y="392">Runs at every stage of a pipeline</text>
+<text class="s" x="36" y="416">ingestion gate, in flight, after load; in CI through the GitHub Action; from Python or the trueset CLI</text>
+</svg></button>
+    <figcaption>How TrueSet works. Click the diagram to open it full size.</figcaption>
+  </figure>
+  <dialog class="arch-dlg" id="arch-dlg" aria-label="TrueSet diagram"><div class="bar"><span>How TrueSet works</span><button type="button" id="arch-close">Close</button></div><div class="body"></div></dialog>
+  <div class="story"><h2>01<span>Why I'm building it</span></h2><div class="prose"><p>The most expensive data problems I have found in client work were not in any one table. $2.97M of revenue credited to the wrong place came from a join fallback four layers down. $2.17M of discounts were zeroed somewhere between the point-of-sale system and the warehouse. Every table on its own looked fine.</p><p>Catching that kind of break means checking one system against another, and the only open-source tool built for it, <code>data-diff</code>, was archived in 2024. So I built TrueSet: reconciliation as a first-class check, alongside the everyday ones, with the same definition running wherever the data is.</p></div></div>
+  <div class="story"><h2>02<span>What it does that others can't</span></h2><div class="prose"><p><b>Cross-system reconciliation.</b> Prove a load against its source: counts agree, every key traces back, and the values themselves match. It reports every failure mode at once (changed values, keys missing on either side, duplicates), even when the two sides live on different engines.</p>
+<pre class="code"><code>checks:
+  - type: row_count_parity
+    reference: source
+  - type: value_parity
+    key: order_id
+    columns: [amount, status]
+    reference: source
+    ref_key: id</code></pre>
+<p><b>Corroboration</b> (newer, experimental). When an extreme value is often the truth (a demand spike, a market move), a fixed threshold cannot tell signal from mistake. TrueSet trusts a spike only if supporting signals agree: volume moved too, or a second independent feed shows the same thing. A lone spike gets surfaced.</p>
+<pre class="code"><code>  - type: corroboration
+    column: price
+    corroborate_with: [volume]
+    severity: warn</code></pre></div></div>
+  <div class="story"><h2>03<span>What ships today</span></h2><div class="prose"><ul>
+<li><b>Checks:</b> not_null, unique, in_set, in_range, matches_regex, row_count, no_duplicate_rows, columns_exist and aggregate metrics.</li>
+<li><b>Reconciliation:</b> row_count_parity, referential_integrity and value_parity, across systems and engines.</li>
+<li><b>Portability:</b> one check runs on pandas, DuckDB or any SQLAlchemy warehouse, with identical verdicts verified against a real Postgres.</li>
+<li><b>Pipeline:</b> run at ingestion, in flight or after load; failing rows go to a quarantine file with their reasons.</li>
+<li><b>Governance:</b> owner, sensitivity, regulation and tags on any check; reports by each; PII and PCI classification.</li>
+<li><b>Monitoring:</b> freshness, plus volume and metric anomalies against run history, with results kept as an audit trail.</li>
+<li><b>Adoption:</b> import existing dbt tests, profile and suggest checks from a sample, a GitHub Action, and <code>pip install trueset</code>.</li></ul>
+<div class="note"><b>One trust rule throughout:</b> AI can draft and explain checks, but only deterministic, auditable code ever decides pass or fail. Validation stays reproducible.</div></div></div>
+  <div class="story"><h2>04<span>Where it already runs</span></h2><div class="prose"><p>TrueSet does the load reconciliation in my <a href="holdings-data-quality.html">holdings data quality monitor</a>, proving what was loaded against what the SEC published, and the data contracts in the <a href="health-claims-platform.html">claims platform</a>, where exactly the 40 broken rows are quarantined with their reasons.</p></div></div>
+  <div class="story"><h2>05<span>What's next</span></h2><div class="prose"><ul>
+<li><b>Thresholds that set themselves:</b> limits calibrated from a data sample ship today; learning normal ranges from run history and per segment is next.</li>
+<li><b>AI failure diagnosis:</b> explaining why a check failed, on top of the deterministic result, plus suggested sensitivity and ownership tags for columns no pattern catches. Suggested and human-reviewed, never applied automatically.</li>
+<li><b>Data contracts:</b> named, versioned suites bound to a dataset, with an owner and an SLA.</li></ul>
+<p>The full list lives in the public <a href="https://github.com/trueset-dev/trueset/blob/main/ROADMAP.md">roadmap</a>. Feedback and early users are very welcome.</p></div></div>
+  <div class="story"><h2>06<span>Stack</span></h2><div class="prose"><div class="chips"><span class="chip">Python</span><span class="chip">pandas</span><span class="chip">DuckDB</span><span class="chip">SQLAlchemy</span><span class="chip">Pushed-down SQL</span><span class="chip">GitHub Actions</span><span class="chip">PyPI</span></div><p style="margin-top:18px;font-size:15px">Focus: Data quality · Reconciliation · Governance</p></div></div>
 </div>
 <section class="alt" style="padding:80px 0">
   <div class="wrap">
@@ -92,5 +168,6 @@
 </main>
 <footer><div class="wrap">&copy; 2026 Iyanujesu Taiwo Akinyefa</div></footer>
 <script src="../assets/site.js" defer></script>
+<script>(function(){var b=document.querySelector('.arch-open'),d=document.getElementById('arch-dlg');if(!b||!d||!d.showModal)return;var body=d.querySelector('.body');b.addEventListener('click',function(){if(!body.firstChild){var c=b.querySelector('svg').cloneNode(true);c.removeAttribute('aria-labelledby');c.setAttribute('aria-label','TrueSet diagram');body.appendChild(c);}d.showModal();});document.getElementById('arch-close').addEventListener('click',function(){d.close();});d.addEventListener('click',function(e){if(e.target===d)d.close();});})();</script>
 </body>
 </html>
