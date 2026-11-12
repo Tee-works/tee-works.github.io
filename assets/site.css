@@ -405,3 +405,22 @@ dialog.arch-dlg::backdrop { background: rgba(0,0,0,.7); }
 .band h3 { font-family: var(--serif); font-size: clamp(24px, 2.6vw, 34px); line-height: 1.15; margin: 0 0 8px; }
 .band p { margin: 0; color: var(--ink-2); font-size: 15.5px; max-width: 720px; }
 @media (max-width: 760px) { .band { grid-template-columns: 1fr; padding: 22px 18px; } }
+
+/* TrueSet brand accent: teal replaces the site red inside .ts only */
+.ts { --ts-teal: #0F766E; --red: #0F766E; --red-soft: #ECF4F2; --signal: #0F766E; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ts { --ts-teal: #2FA89C; --red: #3DBBAE; --red-soft: #0E2A27; --signal: #3DBBAE; } }
+:root[data-theme="dark"] .ts { --ts-teal: #2FA89C; --red: #3DBBAE; --red-soft: #0E2A27; --signal: #3DBBAE; }
+.ts-mark { width: 48px; height: 48px; flex: none; }
+.ts-mark.big { width: 96px; height: 96px; }
+.ts-lockup { display: flex; align-items: center; gap: 8px; margin-bottom: 22px; }
+.ts-word { font-family: "IBM Plex Sans", var(--sans); font-weight: 600; font-size: 32px; letter-spacing: -0.01em; color: var(--ink); }
+.ts-pill { font: 500 11.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--red); background: var(--red-soft); padding: 4px 10px; border-radius: 20px; margin-left: 6px; }
+.ts .prose pre.code { border-left: 3px solid var(--red); }
+.ts .prose pre.code code { font-family: "IBM Plex Mono", var(--mono); }
+.ts .chip { border-color: var(--red); }
+.band.ts .k { display: flex; align-items: center; gap: 8px; }
+.band.ts .k .ts-mark { width: 22px; height: 22px; }
+.ts-art { display: flex; align-items: center; justify-content: center; gap: 14px; background: var(--red-soft); }
+.ts-art .ts-word { font-size: 38px; }
+.art.ts-art svg.ts-mark.big { width: 88px; height: 88px; }
+.art.ts-art .ts-word { font-size: 34px; }
