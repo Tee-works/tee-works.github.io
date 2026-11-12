@@ -120,7 +120,7 @@
         rows.forEach(function (r) { r.classList.remove('picked'); r.classList.add('bad'); });
         tr.classList.add('picked');
         reveal.classList.add('show');
-        reveal.innerHTML = '<b>Trick question: all four are wrong.</b>A subsidiary’s holdings were counted inside its parent’s book every quarter, so the error moved with the trend and every quarter-on-quarter check passed. Only a control that compares each entity with what it reports separately catches it. In the real filings it was up to $99.6bn in one report. <a href="' + reveal.dataset.href + '">See the case study &rarr;</a>';
+        reveal.innerHTML = '<b>Trick question: all four are wrong.</b>A subsidiary’s holdings were counted inside its parent’s book every quarter, so the error moved with the trend and every quarter-on-quarter check passed. Only a control that compares each entity with what it reports separately catches it. In the real filings it was up to $99.6bn in one report. <span class="reveal-ctas"><a href="' + reveal.dataset.href + '">See how I caught it &rarr;</a><a href="#contact">Want your reports checked for errors like this? Let\u2019s talk &rarr;</a></span>';
       }
       tr.addEventListener('click', pick);
       tr.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });

@@ -424,3 +424,10 @@ dialog.arch-dlg::backdrop { background: rgba(0,0,0,.7); }
 .ts-art .ts-word { font-size: 38px; }
 .art.ts-art svg.ts-mark.big { width: 88px; height: 88px; }
 .art.ts-art .ts-word { font-size: 34px; }
+
+/* reveal CTAs and audit offer (12 Nov 2026) */
+.reveal-ctas { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 12px; }
+.audit-offer { margin: 6px 0 30px; padding: 18px 22px; border-left: 3px solid var(--red); background: var(--bg-2); max-width: 760px; }
+.audit-offer .k { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--red); margin-bottom: 8px; }
+.audit-offer ul { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 15.5px; }
+.audit-offer li { margin: 4px 0; }
