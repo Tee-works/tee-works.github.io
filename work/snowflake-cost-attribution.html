@@ -35,6 +35,100 @@
   <dl class="cs-meta"><div><dt>Type</dt><dd>Independent project</dd></div><div><dt>Runs on</dt><dd>AWS + live Snowflake</dd></div><div><dt>Infra</dt><dd>Terraform, 88 resources</dd></div><div><dt>Focus</dt><dd>Cost attribution, showback</dd></div></dl>
 </div></div>
 <div class="wrap">
+  <figure class="arch" id="architecture">
+    <button class="arch-open" type="button" aria-haspopup="dialog" aria-label="Open the architecture diagram full size"><svg viewBox="0 0 1000 590" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="arch-t arch-d">
+<title id="arch-t">Architecture: daily Snowflake cost showback on AWS</title>
+<desc id="arch-d">EventBridge Scheduler starts an ECS Fargate task each morning. The task runs an Airflow DAG that extracts SNOWFLAKE.ACCOUNT_USAGE with key-pair auth, builds four SQL models, fails at a reconciliation gate unless attributed plus idle credits equal the bill, and publishes the showback to S3. Failures email an SNS alert. On Snowflake, a tagged team workload runs on three warehouses whose metering lands in ACCOUNT_USAGE. Terraform manages both clouds and GitHub Actions runs the tests and the full DAG on every push.</desc>
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+<marker id="ahr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah hl" d="M0,0 L10,5 L0,10 z"/></marker>
+</defs>
+
+<rect class="fr" x="10" y="10" width="630" height="480"/>
+<text class="ft" x="26" y="34">AWS · eu-central-1</text>
+
+<rect class="bx" x="30" y="56" width="180" height="70"/>
+<text class="t" x="44" y="80">EventBridge Scheduler</text>
+<text class="s" x="44" y="99">showback daily 06:00 UTC</text>
+<text class="s" x="44" y="115">workload weekdays 08:00</text>
+
+<rect class="bx" x="30" y="150" width="180" height="64"/>
+<text class="t" x="44" y="176">Secrets Manager</text>
+<text class="s" x="44" y="196">Snowflake private key</text>
+
+<rect class="bx" x="30" y="240" width="180" height="64"/>
+<text class="t" x="44" y="266">CloudWatch Logs</text>
+<text class="s" x="44" y="286">every run, kept 30 days</text>
+
+<rect class="fr" style="stroke:var(--ink-2)" x="240" y="50" width="380" height="330"/>
+<text class="ft" x="256" y="74">ECS Fargate · Airflow 3 DAG</text>
+
+<rect class="bx" x="262" y="90" width="336" height="36"/>
+<text class="m" x="276" y="113">extract_account_usage</text><text class="s" x="452" y="113">key-pair auth</text>
+<rect class="bx" x="262" y="140" width="336" height="36"/>
+<text class="m" x="276" y="163">check_sources</text><text class="s" x="452" y="163">stop if a source is empty</text>
+<rect class="bx" x="262" y="190" width="336" height="36"/>
+<text class="m" x="276" y="213">build_01 … build_04</text><text class="s" x="452" y="213">4 SQL models (DuckDB)</text>
+<rect class="bx hl" x="262" y="240" width="336" height="36"/>
+<text class="m hl" x="276" y="263">reconcile_gate</text><text class="s" x="452" y="263">attributed + idle = bill</text>
+<rect class="bx" x="262" y="290" width="336" height="36"/>
+<text class="m" x="276" y="313">publish_showback</text><text class="s" x="452" y="313">showback and alerts</text>
+<path class="ln" d="M300 126 V139" marker-end="url(#ah)"/>
+<path class="ln" d="M300 176 V189" marker-end="url(#ah)"/>
+<path class="ln" d="M300 226 V239" marker-end="url(#ah)"/>
+<path class="ln" d="M300 276 V289" marker-end="url(#ah)"/>
+
+<path class="ln" d="M210 91 H239" marker-end="url(#ah)"/>
+<path class="ln" d="M210 182 H239" marker-end="url(#ah)"/>
+<path class="ln" d="M240 272 H211" marker-end="url(#ah)"/>
+
+<rect class="bx" x="240" y="410" width="180" height="60"/>
+<text class="t" x="254" y="435">S3 reports</text>
+<text class="s" x="254" y="454">reports/&lt;date&gt;/ and latest/</text>
+<path class="ln" d="M330 326 V409" marker-end="url(#ah)"/>
+
+<rect class="bx" x="440" y="410" width="180" height="60"/>
+<text class="t" x="454" y="435">SNS email alert</text>
+<text class="s" x="454" y="454">any failed task or check</text>
+<path class="ln hl" d="M598 258 H630 V440 H621" marker-end="url(#ahr)"/>
+
+<rect class="fr" x="670" y="10" width="320" height="480"/>
+<text class="ft" x="686" y="34">Snowflake · live account</text>
+
+<rect class="bx" x="690" y="56" width="280" height="74"/>
+<text class="t" x="704" y="80">SNOWFLAKE.ACCOUNT_USAGE</text>
+<text class="s" x="704" y="99">QUERY_HISTORY</text>
+<text class="s" x="704" y="116">WAREHOUSE_METERING_HISTORY</text>
+<path class="ln" d="M689 100 H599" marker-end="url(#ah)"/>
+<text class="lb" x="607" y="94">read</text>
+
+<rect class="bx" x="690" y="180" width="280" height="86"/>
+<text class="t" x="704" y="204">3 warehouses, X-Small</text>
+<text class="s" x="704" y="224">TRANSFORM_WH · BI_WH · ADHOC_WH</text>
+<text class="s" x="704" y="242">auto-suspend 60 s · 600 s · 300 s</text>
+<path class="ln" d="M830 180 V131" marker-end="url(#ah)"/>
+<text class="lb" x="838" y="160">metering</text>
+
+<rect class="bx" x="690" y="316" width="280" height="100"/>
+<text class="t" x="704" y="340">Team workload, tagged queries</text>
+<text class="s" x="704" y="360">8 analysts across 4 teams</text>
+<text class="s" x="704" y="378">BI and transform service accounts</text>
+<text class="s" x="704" y="396">own key per user, a tag per workload</text>
+<path class="ln" d="M830 316 V267" marker-end="url(#ah)"/>
+<text class="lb" x="838" y="296">queries</text>
+
+<text class="s" x="690" y="456">Resource monitor caps spend at 40 credits a month</text>
+
+<rect class="bx" x="10" y="510" width="980" height="70"/>
+<text class="t" x="26" y="538">Terraform manages both clouds</text>
+<text class="s" x="26" y="560">Snowflake: warehouses, roles, users, grants (67) · AWS: runtime, storage, secrets, IAM (21)</text>
+<path class="ln" style="stroke:var(--rule)" d="M640 522 V568"/>
+<text class="t" x="660" y="538">GitHub Actions CI</text>
+<text class="s" x="660" y="560">tests and a full DAG run on every push</text>
+</svg></button>
+    <figcaption>How it runs. Click the diagram to open it full size.</figcaption>
+  </figure>
+  <dialog class="arch-dlg" id="arch-dlg" aria-label="Architecture diagram"><div class="bar"><span>Architecture</span><button type="button" id="arch-close">Close</button></div><div class="body"></div></dialog>
   <div class="story"><h2>01<span>The problem</span></h2><div class="prose"><p>Snowflake bills for the time a warehouse is running, including the idle tail before it auto-suspends. Snowflake’s own <code>QUERY_ATTRIBUTION_HISTORY</code> leaves idle time out, so attributing cost per user alone can hide most of the bill.</p><p>And showback that people cannot reconcile to the bill gets argued with, not acted on. Every credit has to land somewhere, and the total has to match the invoice.</p><p>The Snowflake account is set up like a decentralised analytics team: 8 analysts across finance, risk, marketing and operations, a BI service account refreshing a dashboard, and a transform service account rebuilding a daily model. They run as a scripted workload on three warehouses, each user signing in with its own key and tagging its queries. The queries, the metering and the bill are real.</p></div></div>
   <div class="story"><h2>02<span>What I built</span></h2><div class="prose"><ul><li><b>Query x hour slices</b>, so a long query is split across the clock hours it ran in.</li><li><b>Warehouse busy time as the union of query time</b>, so concurrent queries are not double counted. Idle time is billed running time minus busy time.</li><li><b>Query cost</b>: each hour’s active credits are shared by its queries in proportion to execution seconds, and idle credits stay with the warehouse instead of being smeared across users.</li><li><b>Showback</b> by user, team and workload, in credits and USD, with alerts for a team week-over-week spike, a warehouse idle share over 25%, and any workload over 10% of spend.</li><li>Five checks run on every build: the reconciliation to the bill, one row per query, every query costed, no negative or null costs, and busy time never more than running time. Four tests check the checks, including that the planted problems are flagged and that a rebuild gives the same numbers.</li><li><b>Production on AWS</b>: EventBridge Scheduler starts an ECS Fargate task each morning. It runs the Airflow DAG (extract from <code>ACCOUNT_USAGE</code>, one task per model, a reconciliation gate, publish), writes the showback to S3 and emails an SNS alert if any step or check fails. The Snowflake key lives in Secrets Manager, and IAM is least-privilege.</li><li><b>Terraform for both clouds</b>: warehouses, a role per team, key-pair service users and grants in Snowflake (67 resources); the runtime, storage, secrets and schedules in AWS (21). An account-level resource monitor caps spend.</li></ul></div></div>
   <div class="story"><h2>03<span>The result</span></h2><div class="prose"><div class="tiles"><div class="tile"><div class="n red">99%</div><div class="l">of the live bill was idle warehouse time (1.949 of 1.973 credits)</div></div><div class="tile"><div class="n">1e-6</div><div class="l">attributed plus idle credits equal the bill, to this tolerance</div></div><div class="tile"><div class="n red">99.8%</div><div class="l">of the BI warehouse’s credits were idle, for under 6 seconds of query time</div></div><div class="tile"><div class="n">41%</div><div class="l">of query spend came from one unfiltered scan</div></div></div><p>On the live account, almost the whole bill was warehouses running with nothing to do. The dashboard refreshes every 5 minutes, but its warehouse waits 600 seconds before suspending, so it never suspends. A per-query cost view would have shown about 1% of this bill and hidden the rest. The fixes are auto-suspend per warehouse and fewer, busier warehouses for sporadic ad hoc users, not asking analysts to write cheaper SQL.</p><p>Before going live, the models were tested on a seeded four-week sample (9,451 queries) with planted problems: an overnight dashboard refresh, an hourly unfiltered scan and a team spike. All three were caught.</p></div></div>
@@ -63,5 +157,6 @@
 </main>
 <footer><div class="wrap">&copy; 2026 Iyanujesu Taiwo Akinyefa</div></footer>
 <script src="../assets/site.js" defer></script>
+<script>(function(){var b=document.querySelector('.arch-open'),d=document.getElementById('arch-dlg');if(!b||!d||!d.showModal)return;var body=d.querySelector('.body');b.addEventListener('click',function(){if(!body.firstChild){var c=b.querySelector('svg').cloneNode(true);c.removeAttribute('aria-labelledby');c.setAttribute('aria-label','Architecture diagram');body.appendChild(c);}d.showModal();});document.getElementById('arch-close').addEventListener('click',function(){d.close();});d.addEventListener('click',function(e){if(e.target===d)d.close();});})();</script>
 </body>
 </html>
